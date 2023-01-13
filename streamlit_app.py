@@ -41,7 +41,8 @@ def main():
             streamlit.dataframe(fruityvice_normalized)
     except URLError as e:
         streamlit.error()
-
+    
+    streamlit.header('View Our Fruit List -- Add Your Favourites!')
     if streamlit.button('Get Fruit Load List'):
         fruit_list = get_fruit_load_list()
         streamlit.header("The fruit load list contains:")
