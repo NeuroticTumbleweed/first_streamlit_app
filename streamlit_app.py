@@ -69,7 +69,7 @@ def get_fruit_load_list():
 
 def insert_row_snowflake(new_fruit):
     with SNOWFLAKE_CONN.cursor() as cursor:
-        cursor.execute("insert into fruit_load_list values ('{new_fruit}')", new_fruit)
+        cursor.execute(f"insert into fruit_load_list values ('{new_fruit}')")
         return f"Thanks for adding {new_fruit}!"
 
 
