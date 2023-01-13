@@ -47,9 +47,9 @@ def main():
         streamlit.header("The fruit load list contains:")
         streamlit.dataframe(fruit_list)
 
-    streamlit.stop()
     add_my_fruit = streamlit.text_input('What fruit would you like to add?')
-    my_cur.execute('insert into fruit_load_list values ()')
+    if streamlit.button('Add a fruit to the list.'):
+        streamlit.text(insert_row_snowflake(add_my_fruit))
 
 
 def get_fruityvice_data(fruit_choice):
@@ -65,6 +65,12 @@ def get_fruit_load_list():
     with SNOWFLAKE_CONN.cursor() as cursor:
         cursor.execute('select * from fruit_load_list')
         return cursor.fetchall()
+
+
+def insert_row_snowflake(new_fruit):
+    with SNOWFLAKE_CONN.cursor() as cursor:
+        cursor.execute("insert into fruit_load_list values ('{new_fruit}')", new_fruit)
+        return f"Thanks for adding {new_fruit}!"
 
 
 if __name__ == '__main__':
