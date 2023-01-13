@@ -5,6 +5,8 @@ import streamlit
 import snowflake.connector
 from urllib.error import URLError
 
+SNOWFLAKE_CONN = snowflake.connector.connect(**streamlit.secrets["snowflake"])
+
 def main():
     streamlit.title('My Parents\' New Healthy Diner')
 
@@ -40,24 +42,30 @@ def main():
     except URLError as e:
         streamlit.error()
 
+    if streamlit.button('Get Fruit Load List'):
+        fruit_list = get_fruit_load_list()
+        streamlit.header("The fruit load list contains:")
+        streamlit.dataframe(fruit_list)
+
     streamlit.stop()
-    my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
-    my_cur = my_cnx.cursor()
-    my_cur.execute('select * from fruit_load_list')
-    my_data_row = my_cur.fetchall()
-    streamlit.header("The fruit load list contains:")
-    streamlit.dataframe(my_data_row)
-
     add_my_fruit = streamlit.text_input('What fruit would you like to add?')
-
     my_cur.execute('insert into fruit_load_list values ()')
 
 
 def get_fruityvice_data(fruit_choice):
+    """Query fruityvice for fruit fruit_choice."""
     fruityvice_response = requests.get(f'https://fruityvice.com/api/fruit/{fruit_choice}')
     fruityvice_normalized = pandas.json_normalize(fruityvice_response.json())
     fruityvice_normalized = fruityvice_normalized.set_index('name')
     return fruityvice_normalized
+
+
+def get_fruit_load_list():
+    """Get the fruit's loaded into the snowflake import table."""
+    with SNOWFLAKE_CONN.cursor() as cursor:
+        cursor.execute('select * from fruit_load_list')
+        return cursor.fetchall()
+
 
 if __name__ == '__main__':
     main()
